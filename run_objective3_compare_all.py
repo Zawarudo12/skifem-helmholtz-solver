@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-
-
 from pathlib import Path
-
-
 
 import matplotlib.pyplot as plt
 
@@ -13,8 +9,6 @@ import matplotlib.patches as patches
 import matplotlib.tri as mtri
 
 import numpy as np
-
-
 
 from photonics_fem.objective3_bodyfitted import (
 
@@ -30,25 +24,11 @@ from photonics_fem.objective3_bodyfitted import (
 
 )
 
-
-
-
-
-# ============================================================
-
-# PATHS / SETTINGS
-
-# ============================================================
-
-
-
 OUT = Path(
 
     "results_objective3_redo"
 
 )
-
-
 
 OUT.mkdir(
 
@@ -56,23 +36,17 @@ OUT.mkdir(
 
 )
 
-
-
 MESH_DIR = Path(
 
     "meshes"
 
 )
 
-
-
 MESH_DIR.mkdir(
 
     exist_ok=True
 
 )
-
-
 
 BASE_MESH = (
 
@@ -82,8 +56,6 @@ BASE_MESH = (
 
 )
 
-
-
 FINE_MESH = (
 
     MESH_DIR
@@ -92,15 +64,11 @@ FINE_MESH = (
 
 )
 
-
-
 FDTD_FILE = Path(
 
     "dataset_hollow_core_fdtd(1).csv"
 
 )
-
-
 
 COMSOL_FILE = Path(
 
@@ -108,14 +76,8 @@ COMSOL_FILE = Path(
 
 )
 
-
-
 FORCE_REMESH = False
 
-
-
-# Match the COMSOL export exactly: 300 nm to 800 nm in 5 nm steps.
-# 0.300, 0.305, ..., 0.800 um = 101 wavelengths.
 WAVELENGTHS = np.linspace(
 
     0.300,
@@ -126,23 +88,15 @@ WAVELENGTHS = np.linspace(
 
 )
 
-
-
-
-
 def make_cfg(
 
     wavelength: float,
 
 ) -> Objective3Config:
 
-
-
     return Objective3Config(
 
         wavelength=wavelength,
-
-
 
         n_inc=1.0 + 0.0j,
 
@@ -150,33 +104,19 @@ def make_cfg(
 
         n_out=1.0 + 0.0j,
 
-
-
         slab_thickness=1.0,
-
-
 
         air_top=0.50,
 
         air_bottom=0.50,
 
-
-
         width=1.0,
 
-
-
         hole_diameter=0.50,
-
-
-
-        # Stronger PML than the first Objective-3 attempt.
 
         pml_top=1.00,
 
         pml_bottom=1.00,
-
-
 
         pml_order=3,
 
@@ -184,21 +124,13 @@ def make_cfg(
 
     )
 
-
-
-
-
 def build_meshes() -> None:
-
-
 
     reference_cfg = make_cfg(
 
         0.600
 
     )
-
-
 
     print()
 
@@ -208,33 +140,21 @@ def build_meshes() -> None:
 
     )
 
-
-
     build_bodyfitted_gmsh_mesh(
 
         BASE_MESH,
 
         reference_cfg,
 
-
-
         h_bulk=0.018,
 
         h_hole=0.008,
 
-
-
         refine_distance=0.20,
-
-
 
         force=FORCE_REMESH,
 
     )
-
-
-
-    # One finer mesh is used only for the convergence test.
 
     build_bodyfitted_gmsh_mesh(
 
@@ -242,37 +162,23 @@ def build_meshes() -> None:
 
         reference_cfg,
 
-
-
         h_bulk=0.0135,
 
         h_hole=0.006,
 
-
-
         refine_distance=0.20,
-
-
 
         force=FORCE_REMESH,
 
     )
 
-
-
-
-
 def mesh_diagnostics() -> None:
-
-
 
     cfg = make_cfg(
 
         0.600
 
     )
-
-
 
     mesh = load_bodyfitted_mesh(
 
@@ -282,8 +188,6 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     print()
 
     print("=" * 84)
@@ -291,8 +195,6 @@ def mesh_diagnostics() -> None:
     print("FIXED BODY-FITTED MESH")
 
     print("=" * 84)
-
-
 
     print(
 
@@ -302,8 +204,6 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     print(
 
         f"triangles = "
@@ -311,8 +211,6 @@ def mesh_diagnostics() -> None:
         f"{mesh.t.shape[1]}"
 
     )
-
-
 
     for name in (
 
@@ -338,16 +236,6 @@ def mesh_diagnostics() -> None:
 
         )
 
-
-
-    # --------------------------------------------------------
-
-    # Mesh visual: zoom around the actual circular boundary.
-
-    # --------------------------------------------------------
-
-
-
     tri = mtri.Triangulation(
 
         mesh.p[0],
@@ -358,15 +246,11 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     fig, ax = plt.subplots(
 
         figsize=(7, 7)
 
     )
-
-
 
     ax.triplot(
 
@@ -375,8 +259,6 @@ def mesh_diagnostics() -> None:
         linewidth=0.35,
 
     )
-
-
 
     circle = patches.Circle(
 
@@ -396,15 +278,11 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     ax.add_patch(
 
         circle
 
     )
-
-
 
     ax.set_xlim(
 
@@ -414,8 +292,6 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     ax.set_ylim(
 
         1.40,
@@ -423,8 +299,6 @@ def mesh_diagnostics() -> None:
         0.60,
 
     )
-
-
 
     ax.set_aspect(
 
@@ -434,15 +308,11 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     ax.set_xlabel(
 
         "x [um]"
 
     )
-
-
 
     ax.set_ylabel(
 
@@ -450,19 +320,13 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     ax.set_title(
 
         "Objective 3 body-fitted mesh: circular-hole zoom"
 
     )
 
-
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -474,13 +338,7 @@ def mesh_diagnostics() -> None:
 
     )
 
-
-
     plt.close()
-
-
-
-
 
 def solve_one(
 
@@ -490,15 +348,11 @@ def solve_one(
 
 ):
 
-
-
     cfg = make_cfg(
 
         wavelength
 
     )
-
-
 
     result = solve_objective3_bodyfitted(
 
@@ -507,8 +361,6 @@ def solve_one(
         mesh_file,
 
     )
-
-
 
     diff = diffraction_orders_bodyfitted(
 
@@ -520,17 +372,9 @@ def solve_one(
 
     )
 
-
-
     return cfg, result, diff
 
-
-
-
-
 def convergence_test() -> bool:
-
-
 
     print()
 
@@ -540,8 +384,6 @@ def convergence_test() -> bool:
 
     print("=" * 84)
 
-
-
     cfg_b, result_b, base = solve_one(
 
         0.600,
@@ -549,8 +391,6 @@ def convergence_test() -> bool:
         BASE_MESH,
 
     )
-
-
 
     cfg_f, result_f, fine = solve_one(
 
@@ -560,8 +400,6 @@ def convergence_test() -> bool:
 
     )
 
-
-
     dR = abs(
 
         base["R"]
@@ -569,8 +407,6 @@ def convergence_test() -> bool:
         - fine["R"]
 
     )
-
-
 
     dT = abs(
 
@@ -580,13 +416,9 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print()
 
     print("BASE MESH")
-
-
 
     print(
 
@@ -596,15 +428,11 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print(
 
         f"R = {base['R']:.10f}"
 
     )
-
-
 
     print(
 
@@ -612,15 +440,11 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print(
 
         f"R+T = {base['R_plus_T']:.10f}"
 
     )
-
-
 
     print(
 
@@ -630,13 +454,9 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print()
 
     print("FINE MESH")
-
-
 
     print(
 
@@ -646,15 +466,11 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print(
 
         f"R = {fine['R']:.10f}"
 
     )
-
-
 
     print(
 
@@ -662,15 +478,11 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print(
 
         f"R+T = {fine['R_plus_T']:.10f}"
 
     )
-
-
 
     print(
 
@@ -679,8 +491,6 @@ def convergence_test() -> bool:
         f"{fine['symmetry_abs_max']:.3e}"
 
     )
-
-
 
     print()
 
@@ -692,8 +502,6 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print(
 
         f"|T_base - T_fine| = "
@@ -701,8 +509,6 @@ def convergence_test() -> bool:
         f"{dT:.6e}"
 
     )
-
-
 
     passed = (
 
@@ -714,11 +520,7 @@ def convergence_test() -> bool:
 
     )
 
-
-
     print()
-
-
 
     print(
 
@@ -732,17 +534,9 @@ def convergence_test() -> bool:
 
     )
 
-
-
     return passed
 
-
-
-
-
 def checkpoint_test() -> bool:
-
-
 
     wavelengths = [
 
@@ -764,8 +558,6 @@ def checkpoint_test() -> bool:
 
     ]
 
-
-
     print()
 
     print("=" * 106)
@@ -773,8 +565,6 @@ def checkpoint_test() -> bool:
     print("BODY-FITTED CHECKPOINTS")
 
     print("=" * 106)
-
-
 
     print(
 
@@ -794,15 +584,9 @@ def checkpoint_test() -> bool:
 
     )
 
-
-
     all_pass = True
 
-
-
     for wavelength in wavelengths:
-
-
 
         _, _, diff = solve_one(
 
@@ -811,8 +595,6 @@ def checkpoint_test() -> bool:
             BASE_MESH,
 
         )
-
-
 
         cutoff_text = (
 
@@ -824,8 +606,6 @@ def checkpoint_test() -> bool:
 
         )
 
-
-
         passed = (
 
             diff["energy_error"] < 3e-3
@@ -834,11 +614,7 @@ def checkpoint_test() -> bool:
 
         )
 
-
-
         all_pass &= passed
-
-
 
         print(
 
@@ -858,11 +634,7 @@ def checkpoint_test() -> bool:
 
         )
 
-
-
     print()
-
-
 
     print(
 
@@ -876,17 +648,9 @@ def checkpoint_test() -> bool:
 
     )
 
-
-
     return all_pass
 
-
-
-
-
 def field_plot_600nm() -> None:
-
-
 
     cfg, result, diff = solve_one(
 
@@ -896,11 +660,7 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     sol = result.scattered
-
-
 
     rmesh, us = (
 
@@ -914,13 +674,9 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     x = rmesh.p[0]
 
     y = rmesh.p[1]
-
-
 
     ui = np.exp(
 
@@ -934,8 +690,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     total = (
 
         ui
@@ -943,8 +697,6 @@ def field_plot_600nm() -> None:
         + us
 
     )
-
-
 
     triangle_y = (
 
@@ -955,8 +707,6 @@ def field_plot_600nm() -> None:
         + y[rmesh.t[2]]
 
     ) / 3.0
-
-
 
     mask = (
 
@@ -974,8 +724,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     tri = mtri.Triangulation(
 
         x,
@@ -986,23 +734,17 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     tri.set_mask(
 
         mask
 
     )
 
-
-
     fig, ax = plt.subplots(
 
         figsize=(7.5, 7.5)
 
     )
-
-
 
     field = ax.tripcolor(
 
@@ -1018,8 +760,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     fig.colorbar(
 
         field,
@@ -1029,8 +769,6 @@ def field_plot_600nm() -> None:
         label="Re(E_total)",
 
     )
-
-
 
     circle = patches.Circle(
 
@@ -1050,15 +788,11 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.add_patch(
 
         circle
 
     )
-
-
 
     ax.axhline(
 
@@ -1070,8 +804,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.axhline(
 
         cfg.slab_y1,
@@ -1082,8 +814,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.set_aspect(
 
         "equal",
@@ -1091,8 +821,6 @@ def field_plot_600nm() -> None:
         adjustable="box",
 
     )
-
-
 
     ax.set_xlim(
 
@@ -1102,8 +830,6 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.set_ylim(
 
         cfg.total_height,
@@ -1112,15 +838,11 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.set_xlabel(
 
         "x [um]"
 
     )
-
-
 
     ax.set_ylabel(
 
@@ -1128,19 +850,13 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     ax.set_title(
 
         "Body-fitted Objective 3 field @ 600 nm"
 
     )
 
-
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -1152,17 +868,9 @@ def field_plot_600nm() -> None:
 
     )
 
-
-
     plt.close()
 
-
-
-
-
 def full_sweep():
-
-
 
     print()
 
@@ -1172,13 +880,9 @@ def full_sweep():
 
     print("=" * 102)
 
-
-
     rows = []
 
     order_rows = []
-
-
 
     for i, wavelength in enumerate(
 
@@ -1188,8 +892,6 @@ def full_sweep():
 
     ):
 
-
-
         cfg, result, diff = solve_one(
 
             float(wavelength),
@@ -1197,8 +899,6 @@ def full_sweep():
             BASE_MESH,
 
         )
-
-
 
         propagating = [
 
@@ -1210,15 +910,11 @@ def full_sweep():
 
         ]
 
-
-
         cutoff = (
 
             diff["cutoff_orders"]
 
         )
-
-
 
         rows.append(
 
@@ -1244,11 +940,7 @@ def full_sweep():
 
         )
 
-
-
         for row in diff["orders"]:
-
-
 
             if (
 
@@ -1286,8 +978,6 @@ def full_sweep():
 
                 )
 
-
-
         print(
 
             f"[{i:02d}/{len(WAVELENGTHS)}] "
@@ -1308,8 +998,6 @@ def full_sweep():
 
         )
 
-
-
     data = np.asarray(
 
         rows,
@@ -1318,8 +1006,6 @@ def full_sweep():
 
     )
 
-
-
     orders = np.asarray(
 
         order_rows,
@@ -1327,8 +1013,6 @@ def full_sweep():
         dtype=float,
 
     )
-
-
 
     np.savetxt(
 
@@ -1364,8 +1048,6 @@ def full_sweep():
 
     )
 
-
-
     np.savetxt(
 
         OUT
@@ -1396,8 +1078,6 @@ def full_sweep():
 
     )
 
-
-
     wavelength_nm = (
 
         data[:, 0]
@@ -1406,23 +1086,11 @@ def full_sweep():
 
     )
 
-
-
-    # --------------------------------------------------------
-
-    # Total R/T
-
-    # --------------------------------------------------------
-
-
-
     plt.figure(
 
         figsize=(9, 5.5)
 
     )
-
-
 
     plt.plot(
 
@@ -1436,8 +1104,6 @@ def full_sweep():
 
     )
 
-
-
     plt.plot(
 
         wavelength_nm,
@@ -1449,8 +1115,6 @@ def full_sweep():
         label="Body-fitted FEM T",
 
     )
-
-
 
     plt.plot(
 
@@ -1464,15 +1128,11 @@ def full_sweep():
 
     )
 
-
-
     plt.xlabel(
 
         "Wavelength [nm]"
 
     )
-
-
 
     plt.ylabel(
 
@@ -1480,15 +1140,11 @@ def full_sweep():
 
     )
 
-
-
     plt.title(
 
         "Objective 3 redo: total R/T"
 
     )
-
-
 
     plt.ylim(
 
@@ -1498,23 +1154,15 @@ def full_sweep():
 
     )
 
-
-
     plt.grid(
 
         alpha=0.25
 
     )
 
-
-
     plt.legend()
 
-
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -1526,27 +1174,13 @@ def full_sweep():
 
     )
 
-
-
     plt.close()
-
-
-
-    # --------------------------------------------------------
-
-    # Energy + symmetry errors.
-
-    # --------------------------------------------------------
-
-
 
     plt.figure(
 
         figsize=(9, 5.5)
 
     )
-
-
 
     plt.semilogy(
 
@@ -1560,8 +1194,6 @@ def full_sweep():
 
     )
 
-
-
     plt.semilogy(
 
         wavelength_nm,
@@ -1574,8 +1206,6 @@ def full_sweep():
 
     )
 
-
-
     cutoff_mask = (
 
         data[:, 7]
@@ -1583,8 +1213,6 @@ def full_sweep():
         > 0.5
 
     )
-
-
 
     if np.any(
 
@@ -1616,15 +1244,11 @@ def full_sweep():
 
         )
 
-
-
     plt.xlabel(
 
         "Wavelength [nm]"
 
     )
-
-
 
     plt.ylabel(
 
@@ -1632,15 +1256,11 @@ def full_sweep():
 
     )
 
-
-
     plt.title(
 
         "Objective 3 numerical diagnostics"
 
     )
-
-
 
     plt.grid(
 
@@ -1648,15 +1268,9 @@ def full_sweep():
 
     )
 
-
-
     plt.legend()
 
-
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -1668,19 +1282,7 @@ def full_sweep():
 
     )
 
-
-
     plt.close()
-
-
-
-    # --------------------------------------------------------
-
-    # Order-resolved transmission.
-
-    # --------------------------------------------------------
-
-
 
     plt.figure(
 
@@ -1688,19 +1290,13 @@ def full_sweep():
 
     )
 
-
-
     unique_orders = np.unique(
 
         orders[:, 1]
 
     ).astype(int)
 
-
-
     for m in unique_orders:
-
-
 
         mask = (
 
@@ -1711,8 +1307,6 @@ def full_sweep():
             (orders[:, 4] > 0.5)
 
         )
-
-
 
         if np.any(
 
@@ -1730,8 +1324,6 @@ def full_sweep():
 
                 ] * 1000.0,
 
-
-
                 orders[
 
                     mask,
@@ -1740,17 +1332,11 @@ def full_sweep():
 
                 ],
 
-
-
                 "o-",
-
-
 
                 label=f"T m={m}",
 
             )
-
-
 
     plt.xlabel(
 
@@ -1758,15 +1344,11 @@ def full_sweep():
 
     )
 
-
-
     plt.ylabel(
 
         "Transmitted power"
 
     )
-
-
 
     plt.title(
 
@@ -1774,15 +1356,11 @@ def full_sweep():
 
     )
 
-
-
     plt.grid(
 
         alpha=0.25
 
     )
-
-
 
     plt.legend(
 
@@ -1790,11 +1368,7 @@ def full_sweep():
 
     )
 
-
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -1806,15 +1380,7 @@ def full_sweep():
 
     )
 
-
-
     plt.close()
-
-
-
-    # Exclude exact cutoff points from the ordinary energy
-
-    # metric; they are reported separately, not hidden.
 
     noncut = (
 
@@ -1823,8 +1389,6 @@ def full_sweep():
         < 0.5
 
     )
-
-
 
     print()
 
@@ -1836,8 +1400,6 @@ def full_sweep():
 
     )
 
-
-
     print(
 
         "Max non-cutoff symmetry error = "
@@ -1846,13 +1408,7 @@ def full_sweep():
 
     )
 
-
-
     return data
-
-
-
-
 
 def load_fdtd_reference():
 
@@ -1862,8 +1418,6 @@ def load_fdtd_reference():
         print("Skipping FDTD comparison.")
         return None
 
-    # Keep compatibility with the original whitespace-separated FDTD file,
-    # but also accept an ordinary comma-separated CSV.
     try:
         raw = np.loadtxt(FDTD_FILE, delimiter=",")
     except ValueError:
@@ -1881,7 +1435,6 @@ def load_fdtd_reference():
     order = np.argsort(fdtd[:, 0])
     return fdtd[order]
 
-
 def load_comsol_reference():
 
     if not COMSOL_FILE.exists():
@@ -1890,11 +1443,6 @@ def load_comsol_reference():
         print("Skipping COMSOL comparison.")
         return None
 
-    # COMSOL export used here:
-    # col 0 = wavelength [um]
-    # col 2 = TOTAL reflectance
-    # col 4 = TOTAL transmittance
-    # Lines beginning with '%' are metadata/header lines and are ignored.
     raw = np.loadtxt(
         COMSOL_FILE,
         delimiter=",",
@@ -1920,7 +1468,6 @@ def load_comsol_reference():
     order = np.argsort(comsol[:, 0])
     return comsol[order]
 
-
 def compare_all_solvers(fem_data) -> None:
 
     fdtd = load_fdtd_reference()
@@ -1930,8 +1477,6 @@ def compare_all_solvers(fem_data) -> None:
     fem_R = fem_data[:, 1]
     fem_T = fem_data[:, 2]
 
-    # Common comparison grid = the scikit-fem sweep, which is now the
-    # same 5 nm grid as COMSOL: 300, 305, ..., 800 nm.
     common_w = fem_w
 
     columns = [common_w, fem_R, fem_T]
@@ -1994,9 +1539,6 @@ def compare_all_solvers(fem_data) -> None:
 
     wavelength_nm = common_w * 1000.0
 
-    # --------------------------------------------------------
-    # REFLECTANCE: all three solvers on ONE graph.
-    # --------------------------------------------------------
     plt.figure(figsize=(10, 6))
 
     plt.plot(
@@ -2042,9 +1584,6 @@ def compare_all_solvers(fem_data) -> None:
     )
     plt.close()
 
-    # --------------------------------------------------------
-    # TRANSMITTANCE: all three solvers on ONE graph.
-    # --------------------------------------------------------
     plt.figure(figsize=(10, 6))
 
     plt.plot(
@@ -2090,7 +1629,6 @@ def compare_all_solvers(fem_data) -> None:
     )
     plt.close()
 
-    # Save all three datasets on the same 5 nm wavelength grid.
     comparison = np.column_stack(columns)
     np.savetxt(
         OUT / "objective3_skfem_comsol_fdtd.csv",
@@ -2100,11 +1638,7 @@ def compare_all_solvers(fem_data) -> None:
         comments="",
     )
 
-
-
 def main() -> None:
-
-
 
     print()
 
@@ -2116,39 +1650,23 @@ def main() -> None:
 
     print("=" * 84)
 
-
-
     build_meshes()
-
-
 
     mesh_diagnostics()
 
-
-
     convergence_test()
-
-
 
     checkpoint_test()
 
-
-
     field_plot_600nm()
 
-
-
     fem_data = full_sweep()
-
-
 
     compare_all_solvers(
 
         fem_data
 
     )
-
-
 
     print()
 
@@ -2158,8 +1676,6 @@ def main() -> None:
 
     print("=" * 84)
 
-
-
     print()
 
     print(
@@ -2167,10 +1683,6 @@ def main() -> None:
         f"Results written to: {OUT}"
 
     )
-
-
-
-
 
 if __name__ == "__main__":
 

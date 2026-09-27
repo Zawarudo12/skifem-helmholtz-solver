@@ -9,7 +9,6 @@ from .config import SlabConfig
 from .forms import assemble_robin_and_source, assemble_te_volume
 from .mesh import make_aligned_mesh
 
-
 @dataclass
 class FEMSolution:
     cfg: SlabConfig
@@ -19,7 +18,6 @@ class FEMSolution:
     u: np.ndarray
     A: csr_matrix
     b: np.ndarray
-
 
 def solve_slab(cfg: SlabConfig, h_target: float, order: int = 1) -> FEMSolution:
     """Solve the Phase-1 TE slab problem using P1 or P2 triangles."""
@@ -37,6 +35,5 @@ def solve_slab(cfg: SlabConfig, h_target: float, order: int = 1) -> FEMSolution:
     B, b = assemble_robin_and_source(basis, cfg)
     A = (K - (cfg.k0 ** 2) * M + B).tocsr()
 
-    # Helmholtz matrices are generally complex symmetric, not Hermitian.
     u = spsolve(A.tocsc(), b)
     return FEMSolution(cfg=cfg, order=order, mesh=mesh, basis=basis, u=u, A=A, b=b)

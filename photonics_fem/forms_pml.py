@@ -22,7 +22,6 @@ from .forms import (
 
 from .pml import BottomPMLConfig
 
-
 def assemble_physical_volume(
     basis: Basis,
     cfg: BottomPMLConfig,
@@ -61,7 +60,6 @@ def assemble_physical_volume(
         )
 
     return K.tocsr(), M.tocsr()
-
 
 def assemble_bottom_pml(
     basis: Basis,
@@ -133,7 +131,6 @@ def assemble_bottom_pml(
         pml_form,
         pml_basis,
     ).tocsr()
-
 
 def assemble_top_source(
     basis: Basis,

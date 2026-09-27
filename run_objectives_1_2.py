@@ -31,43 +31,18 @@ from photonics_fem.oblique import (
     slab_rt_te_oblique,
 )
 
-
-# ============================================================
-# SETTINGS
-# ============================================================
-
 OUT = Path("results_objectives_1_2")
 OUT.mkdir(exist_ok=True)
 
-
-# 300 nm -> 800 nm
 WAVELENGTHS = np.linspace(
     0.300,
     0.800,
     26,
 )
 
-
-# P2 FEM.
-#
-# For the initial sweep we use 12 elements per shortest
-# material wavelength.
-#
-# Once everything passes, we can increase this to 16 or 18
-# for the final publication-quality sweep.
 PPW = 12
 
-
-# Unit-cell width.
-#
-# Uniform structures do not care about width, but using
-# 1 um makes this consistent with Objective 3.
 PERIOD = 1.0
-
-
-# ============================================================
-# ANALYTIC SINGLE INTERFACE
-# ============================================================
 
 def fresnel_single_interface(
     n1: complex,
@@ -98,19 +73,10 @@ def fresnel_single_interface(
 
     return R, T
 
-
-# ============================================================
-# OBJECTIVE 1 R/T EXTRACTION
-# ============================================================
-
 def extract_interface_rt(
     sol,
     cfg,
 ) -> dict[str, float]:
-
-    # --------------------------------------------------------
-    # Sample top homogeneous air region
-    # --------------------------------------------------------
 
     yt = np.linspace(
         0.08 * cfg.air_top,
@@ -122,10 +88,6 @@ def extract_interface_rt(
         sol,
         yt,
     )
-
-    # --------------------------------------------------------
-    # Sample homogeneous substrate region before the PML
-    # --------------------------------------------------------
 
     yb = np.linspace(
         cfg.slab_y1
@@ -142,10 +104,6 @@ def extract_interface_rt(
         yb,
     )
 
-    # --------------------------------------------------------
-    # Wavenumbers
-    # --------------------------------------------------------
-
     k_top = (
         cfg.k0
         * cfg.n_inc
@@ -155,14 +113,6 @@ def extract_interface_rt(
         cfg.k0
         * cfg.n_out
     )
-
-    # --------------------------------------------------------
-    # Top:
-    #
-    # downward incident
-    # +
-    # upward reflected
-    # --------------------------------------------------------
 
     Xt = np.column_stack(
         [
@@ -186,14 +136,6 @@ def extract_interface_rt(
         rcond=None,
     )[0]
 
-    # --------------------------------------------------------
-    # Bottom:
-    #
-    # downward transmitted
-    # +
-    # possible unwanted incoming component
-    # --------------------------------------------------------
-
     Xb = np.column_stack(
         [
             np.exp(
@@ -215,10 +157,6 @@ def extract_interface_rt(
         ub,
         rcond=None,
     )[0]
-
-    # --------------------------------------------------------
-    # Power
-    # --------------------------------------------------------
 
     R = float(
         abs(
@@ -249,13 +187,6 @@ def extract_interface_rt(
         ),
     }
 
-
-# ============================================================
-# OBJECTIVE 1
-#
-# AIR -> SEMI-INFINITE n=1.5
-# ============================================================
-
 def run_objective_1():
 
     print()
@@ -285,16 +216,6 @@ def run_objective_1():
         WAVELENGTHS,
         start=1,
     ):
-
-        # ----------------------------------------------------
-        # We model a single interface by making everything
-        # below slab_y0 the SAME n=1.5 material:
-        #
-        # n_slab = n_out = 1.5
-        #
-        # Therefore the artificial slab_y1 interface has
-        # zero refractive-index contrast.
-        # ----------------------------------------------------
 
         cfg = BottomPMLConfig(
             wavelength=wavelength,
@@ -395,10 +316,6 @@ def run_objective_1():
         comments="",
     )
 
-    # --------------------------------------------------------
-    # Plot R/T spectrum
-    # --------------------------------------------------------
-
     wavelength_nm = (
         data[:, 0]
         * 1000.0
@@ -468,10 +385,6 @@ def run_objective_1():
 
     plt.close()
 
-    # --------------------------------------------------------
-    # Error plot
-    # --------------------------------------------------------
-
     plt.figure(
         figsize=(8.5, 5.0)
     )
@@ -537,13 +450,6 @@ def run_objective_1():
     )
 
     return data
-
-
-# ============================================================
-# OBJECTIVE 2
-#
-# AIR -> 1 um n=1.5 SLAB -> AIR
-# ============================================================
 
 def run_objective_2():
 
@@ -670,10 +576,6 @@ def run_objective_2():
         * 1000.0
     )
 
-    # --------------------------------------------------------
-    # R/T spectrum
-    # --------------------------------------------------------
-
     plt.figure(
         figsize=(9.0, 5.5)
     )
@@ -738,10 +640,6 @@ def run_objective_2():
     )
 
     plt.close()
-
-    # --------------------------------------------------------
-    # Error plot
-    # --------------------------------------------------------
 
     plt.figure(
         figsize=(8.5, 5.0)
@@ -809,11 +707,6 @@ def run_objective_2():
 
     return data
 
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def main() -> None:
 
     print()
@@ -844,7 +737,6 @@ def main() -> None:
     print(
         f"Results written to: {OUT}"
     )
-
 
 if __name__ == "__main__":
     main()

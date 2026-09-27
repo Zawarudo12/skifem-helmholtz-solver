@@ -14,7 +14,6 @@ import numpy as np
 from photonics_fem.disordered_cached import CachedDisorderedSolver
 from photonics_fem.disordered_fast import DisorderedConfig, diffraction_orders
 
-
 COARSE_MESH = Path(
     "meshes_disordered/disordered_196disks_buffer2_pml3.msh"
 )
@@ -43,7 +42,6 @@ WAVELENGTHS = np.array(
     dtype=float,
 )
 
-
 def make_cfg(wavelength: float) -> DisorderedConfig:
     return DisorderedConfig(
         wavelength=float(wavelength),
@@ -62,7 +60,6 @@ def make_cfg(wavelength: float) -> DisorderedConfig:
         n_disk=3.0 + 0.0j,
     )
 
-
 def load_fdtd():
     try:
         a = np.loadtxt(FDTD_FILE, delimiter=",")
@@ -71,7 +68,6 @@ def load_fdtd():
     if a.ndim == 1:
         a = a.reshape(1, -1)
     return a[:, :3]
-
 
 def load_comsol():
     a = np.genfromtxt(
@@ -86,11 +82,9 @@ def load_comsol():
     order = np.argsort(a[:, 0])
     return a[order]
 
-
 def nearest(data, wavelength):
     i = int(np.argmin(np.abs(data[:, 0] - wavelength)))
     return data[i]
-
 
 def solve_mesh(mesh_file: Path, label: str):
     print()
@@ -149,7 +143,6 @@ def solve_mesh(mesh_file: Path, label: str):
         )
 
     return np.array(rows, dtype=float)
-
 
 def main():
     for p in (
@@ -263,7 +256,6 @@ def main():
         print("T RESULT: refinement moved the selected wavelengths toward COMSOL.")
     else:
         print("T RESULT: refinement did NOT reduce selected-point MAE; investigate formulation/geometry next.")
-
 
 if __name__ == "__main__":
     main()

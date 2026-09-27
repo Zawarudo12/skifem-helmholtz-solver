@@ -21,7 +21,6 @@ from skfem.helpers import grad
 
 from .pml_generic import stretch_1d
 
-
 @dataclass(frozen=True)
 class DisorderedConfig:
     wavelength: float
@@ -30,11 +29,9 @@ class DisorderedConfig:
     xmin: float = -3.5
     xmax: float = 3.5
 
-    # Nominal disk-centre region.
     scatter_ymin: float = -3.5
     scatter_ymax: float = 3.5
 
-    # PML begins outside the 0.5 um air buffers.
     physical_ymin: float = -4.0
     physical_ymax: float = 4.0
 
@@ -60,7 +57,7 @@ class DisorderedConfig:
 
     @property
     def top_monitor_y(self) -> float:
-        # In the ordinary-air buffer, below the top PML.
+
         return 0.5 * (
             self.scatter_ymax
             + self.physical_ymax
@@ -68,12 +65,11 @@ class DisorderedConfig:
 
     @property
     def bottom_monitor_y(self) -> float:
-        # In the ordinary-air buffer, above the bottom PML.
+
         return 0.5 * (
             self.scatter_ymin
             + self.physical_ymin
         )
-
 
 @dataclass
 class SolveTimings:
@@ -85,7 +81,6 @@ class SolveTimings:
     reconstruction: float
     total: float
 
-
 @dataclass
 class DisorderedSolveResult:
     cfg: DisorderedConfig
@@ -96,7 +91,6 @@ class DisorderedSolveResult:
     reduced_dofs: int
     free_reduced_dofs: int
     timings: SolveTimings
-
 
 def _require_named_groups(
     mesh: MeshTri,
@@ -149,7 +143,6 @@ def _require_named_groups(
             f"Missing boundaries: {sorted(missing_boundaries)}"
         )
 
-
 def load_disordered_mesh(
     mesh_file: str | Path,
 ) -> MeshTri:
@@ -163,7 +156,6 @@ def load_disordered_mesh(
     )
 
     return mesh
-
 
 def build_normal_incidence_periodic_projection(
     basis: Basis,
@@ -277,8 +269,6 @@ def build_normal_incidence_periodic_projection(
         dtype=int,
     )
 
-    # Right/slave DOF takes the same reduced unknown as
-    # its matching left/master DOF.
     full_to_reduced[
         right
     ] = full_to_reduced[
@@ -326,7 +316,6 @@ def build_normal_incidence_periodic_projection(
         max_y_mismatch,
     )
 
-
 def _stretch_y(
     y,
     cfg: DisorderedConfig,
@@ -340,7 +329,6 @@ def _stretch_y(
         sigma_max=cfg.pml_sigma_max,
         order=cfg.pml_order,
     )
-
 
 def assemble_static_matrices(
     basis: Basis,
@@ -447,7 +435,6 @@ def assemble_static_matrices(
         M.tocsr(),
     )
 
-
 def assemble_scattered_source(
     basis: Basis,
     cfg: DisorderedConfig,
@@ -502,7 +489,6 @@ def assemble_scattered_source(
         ),
         dtype=np.complex128,
     )
-
 
 def solve_disordered(
     cfg: DisorderedConfig,
@@ -672,7 +658,6 @@ def solve_disordered(
         total=t6 - total_start,
     )
 
-    # Useful diagnostic attached as ordinary attributes.
     timings.periodic_y_mismatch = periodic_y_mismatch
     timings.left_periodic_dofs = int(
         left_dofs.size
@@ -691,7 +676,6 @@ def solve_disordered(
         free_reduced_dofs=free_red.size,
         timings=timings,
     )
-
 
 def sample_horizontal_line(
     result: DisorderedSolveResult,
@@ -774,7 +758,6 @@ def sample_horizontal_line(
         values,
     )
 
-
 def diffraction_orders(
     result: DisorderedSolveResult,
     *,
@@ -813,7 +796,6 @@ def diffraction_orders(
         npoints=npoints,
     )
 
-    # Downward background plane wave.
     u_inc_bottom = np.exp(
         -1j
         * cfg.k0
@@ -837,7 +819,6 @@ def diffraction_orders(
         )
     )
 
-    # Extra evanescent orders are retained for diagnostics.
     m_values = np.arange(
         -m_prop_est - 3,
         m_prop_est + 4,

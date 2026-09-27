@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, replace
 
-
 @dataclass(frozen=True)
 class SlabConfig:
     """Geometry and material parameters, using micrometres throughout.

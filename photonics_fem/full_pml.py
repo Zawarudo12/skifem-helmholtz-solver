@@ -7,7 +7,6 @@ from skfem import MeshTri
 
 from .config import SlabConfig
 
-
 @dataclass(frozen=True)
 class FullPMLConfig(SlabConfig):
     """Slab configuration with PMLs above and below the physical domain."""
@@ -26,7 +25,6 @@ class FullPMLConfig(SlabConfig):
     def computational_ymax(self) -> float:
         return self.total_height + self.pml_bottom
 
-
 def _segment_nodes(
     a: float,
     b: float,
@@ -42,7 +40,6 @@ def _segment_nodes(
         b,
         n + 1,
     )
-
 
 def make_full_pml_mesh(
     cfg: FullPMLConfig,
@@ -61,35 +58,30 @@ def make_full_pml_mesh(
         nx + 1,
     )
 
-    # Top PML: -L_top -> 0
     yp_top = _segment_nodes(
         cfg.computational_ymin,
         0.0,
         h_target,
     )
 
-    # Physical top air: 0 -> slab_y0
     yt = _segment_nodes(
         0.0,
         cfg.slab_y0,
         h_target,
     )[1:]
 
-    # Slab
     ys = _segment_nodes(
         cfg.slab_y0,
         cfg.slab_y1,
         h_target,
     )[1:]
 
-    # Physical bottom air
     yb = _segment_nodes(
         cfg.slab_y1,
         cfg.total_height,
         h_target,
     )[1:]
 
-    # Bottom PML
     yp_bottom = _segment_nodes(
         cfg.total_height,
         cfg.computational_ymax,

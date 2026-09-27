@@ -8,22 +8,18 @@ from scipy.sparse import coo_matrix, csr_matrix
 
 from skfem import Basis
 
-
 @dataclass(frozen=True)
 class BlochReduction:
     """Projection data for left/right Bloch-periodic DOF tying."""
 
     P: csr_matrix
 
-    # Matching arrays: left_dofs[j] <-> right_dofs[j]
     left_dofs: np.ndarray
     right_dofs: np.ndarray
 
-    # Maps every full-system DOF to its reduced-system DOF.
     full_to_reduced: np.ndarray
 
     phase: complex
-
 
 def build_bloch_projection(
     basis: Basis,
@@ -41,10 +37,6 @@ def build_bloch_projection(
         u_full = P @ u_reduced.
     """
 
-    # --------------------------------------------------
-    # 1. Find all left/right boundary DOFs.
-    # --------------------------------------------------
-
     left = np.asarray(
         basis.get_dofs("left").flatten(),
         dtype=int,
@@ -60,13 +52,6 @@ def build_bloch_projection(
             "Left/right boundary DOF counts do not match: "
             f"{left.size} != {right.size}"
         )
-
-    # --------------------------------------------------
-    # 2. Pair DOFs according to their y-coordinate.
-    #
-    # This works for both P1 vertex DOFs and P2
-    # vertex + edge-midpoint DOFs.
-    # --------------------------------------------------
 
     y_left = basis.doflocs[1, left]
     y_right = basis.doflocs[1, right]
@@ -92,21 +77,11 @@ def build_bloch_projection(
             f"Maximum paired y mismatch = {max_pair_error:.3e}"
         )
 
-    # --------------------------------------------------
-    # 3. Bloch phase.
-    #
-    # u_R = phase * u_L
-    # --------------------------------------------------
-
     phase = np.exp(
         1j * kx * period
     )
 
     n_full = basis.N
-
-    # Right DOFs are removed from the independent
-    # unknown list because they are determined by
-    # corresponding left DOFs.
 
     is_right = np.zeros(
         n_full,
@@ -121,10 +96,6 @@ def build_bloch_projection(
 
     n_reduced = masters.size
 
-    # --------------------------------------------------
-    # 4. Reduced index of every independent DOF.
-    # --------------------------------------------------
-
     master_to_reduced = np.full(
         n_full,
         -1,
@@ -136,11 +107,7 @@ def build_bloch_projection(
         dtype=int,
     )
 
-    # Every full DOF needs a reduced index.
     full_to_reduced = master_to_reduced.copy()
-
-    # Right boundary points inherit the reduced index
-    # of their matching left boundary DOF.
 
     for l_dof, r_dof in zip(left, right):
         reduced_index = master_to_reduced[l_dof]
@@ -159,27 +126,10 @@ def build_bloch_projection(
             "reduced Bloch DOF."
         )
 
-    # --------------------------------------------------
-    # 5. Construct sparse projection matrix P.
-    #
-    # For ordinary/master DOFs:
-    #
-    #       u_i = z_j
-    #
-    # so P_ij = 1.
-    #
-    # For right boundary DOFs:
-    #
-    #       u_R = phase * u_L
-    #
-    # so P_R,j = phase.
-    # --------------------------------------------------
-
     rows: list[int] = []
     cols: list[int] = []
     data: list[complex] = []
 
-    # Independent DOFs
     for full_dof in masters:
         rows.append(int(full_dof))
         cols.append(
@@ -191,7 +141,6 @@ def build_bloch_projection(
         )
         data.append(1.0 + 0.0j)
 
-    # Slave/right DOFs
     for l_dof, r_dof in zip(left, right):
         rows.append(int(r_dof))
         cols.append(
@@ -227,7 +176,6 @@ def build_bloch_projection(
         full_to_reduced=full_to_reduced,
         phase=phase,
     )
-
 
 def bloch_mismatch(
     u: np.ndarray,

@@ -36,7 +36,6 @@ from .solver import (
     FEMSolution,
 )
 
-
 @dataclass
 class GenericPMLSolveResult:
     scattered: FEMSolution
@@ -50,7 +49,6 @@ class GenericPMLSolveResult:
 
     reduced_dofs: int
     free_reduced_dofs: int
-
 
 def solve_generic_pml_te(
     cfg: FullPMLConfig,
@@ -74,10 +72,6 @@ def solve_generic_pml_te(
             "order must be 1 or 2"
         )
 
-    # --------------------------------------------------
-    # Mesh / FEM basis
-    # --------------------------------------------------
-
     mesh = make_full_pml_mesh(
         cfg,
         h_target=h_target,
@@ -92,18 +86,10 @@ def solve_generic_pml_te(
         ),
     )
 
-    # --------------------------------------------------
-    # Entire Helmholtz + PML operator in one assembly
-    # --------------------------------------------------
-
     A_full = assemble_te_generic_pml(
         basis,
         cfg,
     )
-
-    # --------------------------------------------------
-    # Scattered-field excitation
-    # --------------------------------------------------
 
     b, kx, ky_inc = (
         assemble_scattered_field_source(
@@ -112,10 +98,6 @@ def solve_generic_pml_te(
             angle_deg,
         )
     )
-
-    # --------------------------------------------------
-    # Bloch reduction
-    # --------------------------------------------------
 
     reduction = build_bloch_projection(
         basis=basis,
@@ -143,12 +125,6 @@ def solve_generic_pml_te(
         PH @ b,
         dtype=np.complex128,
     ).reshape(-1)
-
-    # --------------------------------------------------
-    # Outer PML walls:
-    #
-    # scattered field = 0
-    # --------------------------------------------------
 
     top_full = np.asarray(
         basis
@@ -189,10 +165,6 @@ def solve_generic_pml_te(
         outer_red,
     )
 
-    # --------------------------------------------------
-    # Solve
-    # --------------------------------------------------
-
     z = np.zeros(
         A_red.shape[0],
         dtype=np.complex128,
@@ -206,10 +178,6 @@ def solve_generic_pml_te(
             free_red
         ],
     )
-
-    # --------------------------------------------------
-    # Reconstruct full FEM vector
-    # --------------------------------------------------
 
     u_scattered = np.asarray(
         P @ z,

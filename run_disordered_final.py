@@ -21,11 +21,6 @@ from photonics_fem.disordered_fast import (
     diffraction_orders,
 )
 
-
-# ============================================================
-# FILES
-# ============================================================
-
 MESH_FILE = Path(
     "meshes_disordered/disordered_196disks_buffer2_pml3_materialfine.msh"
 )
@@ -43,11 +38,6 @@ OUT = Path(
 )
 OUT.mkdir(exist_ok=True)
 
-
-# ============================================================
-# PHYSICS / NUMERICS
-# ============================================================
-
 AIR_BUFFER = 2.0
 PML_THICKNESS = 3.0
 
@@ -58,7 +48,6 @@ STOP_MIN = 1.4
 STOP_MAX = 1.8
 
 _WORKER_SOLVER = None
-
 
 def make_cfg(wavelength: float) -> DisorderedConfig:
     return DisorderedConfig(
@@ -81,11 +70,6 @@ def make_cfg(wavelength: float) -> DisorderedConfig:
         n_background=1.0 + 0.0j,
         n_disk=3.0 + 0.0j,
     )
-
-
-# ============================================================
-# LOAD REFERENCE DATA
-# ============================================================
 
 def load_fdtd():
     if not FDTD_FILE.exists():
@@ -127,7 +111,6 @@ def load_fdtd():
 
     return data[order]
 
-
 def load_comsol():
     if not COMSOL_FILE.exists():
         raise FileNotFoundError(
@@ -145,7 +128,6 @@ def load_comsol():
     if data.ndim == 1:
         data = data.reshape(1, -1)
 
-    # Remove any malformed / NaN rows.
     good = np.all(
         np.isfinite(data[:, :3]),
         axis=1,
@@ -175,11 +157,6 @@ def load_comsol():
         RT[order],
     )
 
-
-# ============================================================
-# WORKERS
-# ============================================================
-
 def worker_init(mesh_file: str):
     global _WORKER_SOLVER
 
@@ -188,7 +165,6 @@ def worker_init(mesh_file: str):
         Path(mesh_file),
         intorder=8,
     )
-
 
 def summarize_pm5(diff: dict):
     selected = [
@@ -214,7 +190,6 @@ def summarize_pm5(diff: dict):
     )
 
     return R5, T5, omitted
-
 
 def worker_solve(wavelength: float):
     global _WORKER_SOLVER
@@ -250,14 +225,11 @@ def worker_solve(wavelength: float):
     return {
         "wavelength": float(wavelength),
 
-        # MAIN result: physically complete sum over all
-        # propagating Rayleigh orders.
         "R_fem": float(diff["R"]),
         "T_fem": float(diff["T"]),
         "RT_fem": float(diff["R_plus_T"]),
         "energy_fem": float(diff["energy_error"]),
 
-        # Secondary +/-5 diagnostic.
         "R_pm5": R5,
         "T_pm5": T5,
 
@@ -277,11 +249,6 @@ def worker_solve(wavelength: float):
         "point_time": float(t2 - t0),
     }
 
-
-# ============================================================
-# METRICS
-# ============================================================
-
 def metrics(a, b):
     d = np.asarray(a) - np.asarray(b)
     ad = np.abs(d)
@@ -296,7 +263,6 @@ def metrics(a, b):
         "max": float(np.max(ad)),
     }
 
-
 def print_metric(label, m):
     print(
         f"{label:<30} "
@@ -304,11 +270,6 @@ def print_metric(label, m):
         f"RMSE={m['rmse']:.6e}  "
         f"MAX={m['max']:.6e}"
     )
-
-
-# ============================================================
-# MAIN
-# ============================================================
 
 def main():
     parser = argparse.ArgumentParser()
@@ -346,7 +307,6 @@ def main():
         RT_comsol_raw,
     ) = load_comsol()
 
-    # Use the exact FDTD wavelength grid as the scikit-fem grid.
     if args.quick:
         requested = np.array(
             [
@@ -510,7 +470,6 @@ def main():
         ]
     )
 
-    # Interpolate COMSOL and FDTD onto the exact FEM grid.
     R_comsol = np.interp(
         w,
         w_comsol,
@@ -546,9 +505,6 @@ def main():
         + T_fdtd
     )
 
-    # --------------------------------------------------------
-    # Save aligned 3-way data.
-    # --------------------------------------------------------
     data = np.column_stack(
         [
             w,
@@ -639,9 +595,6 @@ def main():
         comments="",
     )
 
-    # --------------------------------------------------------
-    # REFLECTANCE — MAIN FINAL PLOT
-    # --------------------------------------------------------
     fig, ax = plt.subplots(
         figsize=(10.8, 6.4)
     )
@@ -720,9 +673,6 @@ def main():
 
     plt.close(fig)
 
-    # --------------------------------------------------------
-    # TRANSMITTANCE — MAIN FINAL PLOT
-    # --------------------------------------------------------
     fig, ax = plt.subplots(
         figsize=(10.8, 6.4)
     )
@@ -801,9 +751,6 @@ def main():
 
     plt.close(fig)
 
-    # --------------------------------------------------------
-    # +/-5 DIAGNOSTIC ONLY
-    # --------------------------------------------------------
     fig, ax = plt.subplots(
         figsize=(10.8, 5.8)
     )
@@ -878,10 +825,6 @@ def main():
     )
 
     plt.close(fig)
-
-    # --------------------------------------------------------
-    # METRICS
-    # --------------------------------------------------------
 
     m_sc_R = metrics(
         R_fem,
@@ -1023,7 +966,6 @@ def main():
     print(f"Reflectance plot            = {r_plot}")
     print(f"Transmittance plot          = {t_plot}")
     print(f"+/-5 diagnostic            = {pm5_plot}")
-
 
 if __name__ == "__main__":
     main()

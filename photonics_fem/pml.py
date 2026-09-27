@@ -7,7 +7,6 @@ from skfem import MeshTri
 
 from .config import SlabConfig
 
-
 @dataclass(frozen=True)
 class BottomPMLConfig(SlabConfig):
     """Phase-2 configuration with a bottom y-directed PML.
@@ -35,7 +34,6 @@ class BottomPMLConfig(SlabConfig):
         """Physical domain plus PML."""
         return self.total_height + self.pml_bottom
 
-
 def _segment_nodes(
     a: float,
     b: float,
@@ -52,7 +50,6 @@ def _segment_nodes(
         b,
         n + 1,
     )
-
 
 def make_bottom_pml_mesh(
     cfg: BottomPMLConfig,
@@ -71,7 +68,6 @@ def make_bottom_pml_mesh(
         nx + 1,
     )
 
-    # Physical regions
     yt = _segment_nodes(
         0.0,
         cfg.slab_y0,
@@ -90,7 +86,6 @@ def make_bottom_pml_mesh(
         h_target,
     )[1:]
 
-    # PML region
     yp = _segment_nodes(
         cfg.pml_y0,
         cfg.computational_height,

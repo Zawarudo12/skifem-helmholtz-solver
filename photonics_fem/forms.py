@@ -5,21 +5,17 @@ from skfem import Basis, BilinearForm, FacetBasis, LinearForm, asm
 from skfem.helpers import dot, grad
 from .config import SlabConfig
 
-
 @BilinearForm(dtype=np.complex128)
 def stiffness(u, v, w):
     return dot(grad(u), grad(v))
-
 
 @BilinearForm(dtype=np.complex128)
 def scalar_mass(u, v, w):
     return u * v
 
-
 @BilinearForm(dtype=np.complex128)
 def boundary_mass(u, v, w):
     return u * v
-
 
 def assemble_te_volume(basis: Basis, cfg: SlabConfig) -> tuple[csr_matrix, csr_matrix]:
     """Assemble K and epsilon-weighted M for TE(E_z): p=1, q=epsilon_r=n^2."""
@@ -36,7 +32,6 @@ def assemble_te_volume(basis: Basis, cfg: SlabConfig) -> tuple[csr_matrix, csr_m
         block = (n ** 2) * asm(scalar_mass, subbasis)
         M = block if M is None else M + block
     return K, M.tocsr()
-
 
 def assemble_robin_and_source(
     basis: Basis, cfg: SlabConfig
@@ -59,7 +54,7 @@ def assemble_robin_and_source(
 
     @LinearForm(dtype=np.complex128)
     def incident(v, w):
-        # y_top = 0 => u_inc=exp(i k y)=1 on the boundary.
+
         return (-2j * k_top * np.exp(1j * k_top * w.x[1])) * v
 
     b = asm(incident, top)

@@ -23,7 +23,6 @@ from .full_pml import FullPMLConfig
 from .pml_generic import stretch_1d
 from .solver import FEMSolution
 
-
 @dataclass(frozen=True)
 class Objective3Config(FullPMLConfig):
     """Fixed geometry for Objective 3.
@@ -48,14 +47,12 @@ class Objective3Config(FullPMLConfig):
     def hole_center_y(self) -> float:
         return 0.5 * (self.slab_y0 + self.slab_y1)
 
-
 @dataclass
 class Objective3SolveResult:
     scattered: FEMSolution
     reduction: BlochReduction
     reduced_dofs: int
     free_reduced_dofs: int
-
 
 def build_bodyfitted_gmsh_mesh(
     filename: str | Path,
@@ -106,10 +103,6 @@ def build_bodyfitted_gmsh_mesh(
             cfg.total_height + cfg.pml_bottom,
         ]
 
-        # ----------------------------------------------------
-        # Outer rectangle points.
-        # ----------------------------------------------------
-
         p_left = []
         p_right = []
 
@@ -132,7 +125,6 @@ def build_bodyfitted_gmsh_mesh(
                 )
             )
 
-        # Horizontal interfaces.
         horizontal = []
 
         for i in range(len(levels)):
@@ -143,7 +135,6 @@ def build_bodyfitted_gmsh_mesh(
                 )
             )
 
-        # Left/right vertical segments.
         left_vertical = []
         right_vertical = []
 
@@ -161,10 +152,6 @@ def build_bodyfitted_gmsh_mesh(
                     p_right[i + 1],
                 )
             )
-
-        # ----------------------------------------------------
-        # Actual circular boundary.
-        # ----------------------------------------------------
 
         xc = cfg.hole_center_x
         yc = cfg.hole_center_y
@@ -216,10 +203,6 @@ def build_bodyfitted_gmsh_mesh(
             circle_arcs
         )
 
-        # ----------------------------------------------------
-        # Rectangular layer surfaces.
-        # ----------------------------------------------------
-
         surfaces: dict[str, int] = {}
 
         def outer_loop(i: int) -> int:
@@ -240,8 +223,6 @@ def build_bodyfitted_gmsh_mesh(
             [outer_loop(1)]
         )
 
-        # The second loop makes an actual circular hole in
-        # the dielectric surface.
         slab_outer = outer_loop(2)
 
         surfaces["slab"] = geo.addPlaneSurface(
@@ -251,7 +232,6 @@ def build_bodyfitted_gmsh_mesh(
             ]
         )
 
-        # Fill that hole with a separate AIR surface.
         surfaces["hole"] = geo.addPlaneSurface(
             [circle_loop]
         )
@@ -265,12 +245,6 @@ def build_bodyfitted_gmsh_mesh(
         )
 
         geo.synchronize()
-
-        # ----------------------------------------------------
-        # Physical groups.
-        # MeshTri.load can preserve them, although the solver
-        # below also re-tags geometrically for robustness.
-        # ----------------------------------------------------
 
         for name, tag in surfaces.items():
             ptag = gmsh.model.addPhysicalGroup(
@@ -302,12 +276,6 @@ def build_bodyfitted_gmsh_mesh(
                 name,
             )
 
-        # ----------------------------------------------------
-        # Make the RIGHT mesh an exact periodic copy of LEFT.
-        #
-        # x_right = x_left + width
-        # ----------------------------------------------------
-
         affine = [
             1.0, 0.0, 0.0, cfg.width,
             0.0, 1.0, 0.0, 0.0,
@@ -321,10 +289,6 @@ def build_bodyfitted_gmsh_mesh(
             left_vertical,
             affine,
         )
-
-        # ----------------------------------------------------
-        # Refine the mesh around the true circular interface.
-        # ----------------------------------------------------
 
         distance = gmsh.model.mesh.field.add(
             "Distance"
@@ -400,7 +364,6 @@ def build_bodyfitted_gmsh_mesh(
             5,
         )
 
-        # ASCII MSH 2.2 is very widely supported by meshio.
         gmsh.option.setNumber(
             "Mesh.MshFileVersion",
             2.2,
@@ -421,7 +384,6 @@ def build_bodyfitted_gmsh_mesh(
         gmsh.finalize()
 
     return filename
-
 
 def load_bodyfitted_mesh(
     filename: str | Path,
@@ -550,7 +512,6 @@ def load_bodyfitted_mesh(
 
     return mesh
 
-
 def _assemble_operator(
     basis: Basis,
     cfg: Objective3Config,
@@ -633,7 +594,6 @@ def _assemble_operator(
 
     return A.tocsr()
 
-
 def _assemble_source(
     basis: Basis,
     cfg: Objective3Config,
@@ -683,7 +643,6 @@ def _assemble_source(
         dtype=np.complex128,
     )
 
-
 def solve_objective3_bodyfitted(
     cfg: Objective3Config,
     mesh_file: str | Path,
@@ -711,7 +670,6 @@ def solve_objective3_bodyfitted(
         cfg,
     )
 
-    # Normal incidence => Bloch phase = 1.
     reduction = build_bloch_projection(
         basis=basis,
         period=cfg.width,
@@ -812,7 +770,6 @@ def solve_objective3_bodyfitted(
         free_reduced_dofs=free_red.size,
     )
 
-
 def sample_horizontal_line(
     sol: FEMSolution,
     y: float,
@@ -878,7 +835,6 @@ def sample_horizontal_line(
 
     return x, values
 
-
 def diffraction_orders_bodyfitted(
     result: Objective3SolveResult,
     cfg: Objective3Config,
@@ -937,7 +893,6 @@ def diffraction_orders_bodyfitted(
         npoints=npoints,
     )
 
-    # Analytic background incident field.
     u_inc_bottom = np.exp(
         1j
         * cfg.k0
@@ -950,7 +905,6 @@ def diffraction_orders_bodyfitted(
         + u_inc_bottom
     )
 
-    # Include a couple evanescent orders for diagnostics.
     m_prop_est = int(
         np.floor(
             k_air
@@ -1024,10 +978,6 @@ def diffraction_orders_bodyfitted(
             * x
         )
 
-        # Midpoint quadrature for:
-        #
-        # (1/Lambda) int u(x) exp(-i kx_m x) dx
-        #
         r_m = np.mean(
             us_top
             * phase

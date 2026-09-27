@@ -24,7 +24,6 @@ from .oblique import (
     incident_wavevector,
 )
 
-
 def assemble_full_physical_volume(
     basis: Basis,
     cfg: FullPMLConfig,
@@ -73,7 +72,6 @@ def assemble_full_physical_volume(
         M.tocsr(),
     )
 
-
 def _assemble_one_y_pml(
     basis: Basis,
     cfg: FullPMLConfig,
@@ -119,9 +117,6 @@ def _assemble_one_y_pml(
             * xi**cfg.pml_order
         )
 
-        # Same sign works above and below because the
-        # coordinate direction itself reverses when
-        # travelling upward into the top PML.
         sy = (
             1.0
             + 1j * sigma
@@ -158,7 +153,6 @@ def _assemble_one_y_pml(
         pml_basis,
     ).tocsr()
 
-
 def assemble_full_pml_operator(
     basis: Basis,
     cfg: FullPMLConfig,
@@ -189,7 +183,6 @@ def assemble_full_pml_operator(
         top_pml
         + bottom_pml
     ).tocsr()
-
 
 def assemble_scattered_field_source(
     basis: Basis,

@@ -4,11 +4,6 @@ from pathlib import Path
 
 import numpy as np
 
-
-# ============================================================
-# FILES
-# ============================================================
-
 POSITIONS_FILE = Path(
     "disks_positions_diameter=0.26_L=7.csv"
 )
@@ -25,11 +20,6 @@ MESH_FILE = (
     MESH_DIR
     / "disordered_196disks_buffer2_pml3_materialfine.msh"
 )
-
-
-# ============================================================
-# GEOMETRY
-# ============================================================
 
 L = 7.0
 XMIN = -L / 2.0
@@ -67,26 +57,15 @@ DISK_RADIUS = (
     / 2.0
 )
 
-
-# ============================================================
-# MATERIAL-AWARE MESH SIZE
-# ============================================================
-
-# Highest resolution at the n=3 disk interfaces.
 H_DISK = 0.020
 
-# Resolution through the disordered 7 x 7 um material region.
 H_SCATTER = 0.060
 
-# Ordinary-air buffers need less resolution than the material region.
 H_AIR = 0.100
 
-# PML can be coarser because its job is smooth attenuation.
 H_PML = 0.140
 
-# Distance over which interface refinement transitions outward.
 REFINE_DISTANCE = 0.16
-
 
 def load_positions() -> np.ndarray:
 
@@ -110,7 +89,6 @@ def load_positions() -> np.ndarray:
         )
 
     return positions
-
 
 def periodic_disk_centres(
     positions: np.ndarray,
@@ -178,7 +156,6 @@ def periodic_disk_centres(
 
     return centres
 
-
 def curve_bbox(
     gmsh,
     tag: int,
@@ -187,7 +164,6 @@ def curve_bbox(
         1,
         tag,
     )
-
 
 def identify_vertical_boundary_curves(
     gmsh,
@@ -219,9 +195,6 @@ def identify_vertical_boundary_curves(
         x_mid = 0.5 * (xmin + xmax)
         x_width = xmax - xmin
 
-        # OCC/Gmsh pads bounding boxes by a small CAD tolerance,
-        # so a mathematically vertical line at x=x_target often has
-        # xmin/xmax a few 1e-7 away from the exact coordinate.
         if (
             abs(x_mid - x_target) < tol
             and x_width < 2.0 * tol
@@ -243,7 +216,6 @@ def identify_vertical_boundary_curves(
     )
 
     return curves
-
 
 def identify_horizontal_boundary_curves(
     gmsh,
@@ -288,7 +260,6 @@ def identify_horizontal_boundary_curves(
 
     return curves
 
-
 def add_named_physical_group(
     gmsh,
     dim: int,
@@ -322,7 +293,6 @@ def add_named_physical_group(
     )
 
     return physical_tag
-
 
 def build_mesh() -> None:
 
@@ -392,15 +362,6 @@ def build_mesh() -> None:
 
         occ = gmsh.model.occ
 
-        # ----------------------------------------------------
-        # Five horizontal background regions.
-        #
-        # The central 7 um region is the nominal disorder box.
-        # Some supplied disks extend slightly into the air
-        # buffers because their CENTRES, not full radii, were
-        # specified inside the 7 x 7 box.
-        # ----------------------------------------------------
-
         region_specs = [
             (
                 "bottom_pml",
@@ -455,11 +416,6 @@ def build_mesh() -> None:
                 )
             )
 
-        # ----------------------------------------------------
-        # All real disks + the few periodic copies needed to
-        # represent circles crossing x = +/-3.5.
-        # ----------------------------------------------------
-
         disk_entities = []
 
         for (
@@ -490,13 +446,6 @@ def build_mesh() -> None:
 
         occ.synchronize()
 
-        # ----------------------------------------------------
-        # Fragment background regions and disks together.
-        #
-        # This produces true circle-conforming material
-        # interfaces rather than staircase pixels.
-        # ----------------------------------------------------
-
         region_dimtags = [
             entity
             for _, entity
@@ -520,13 +469,6 @@ def build_mesh() -> None:
         )
 
         occ.synchronize()
-
-        # ----------------------------------------------------
-        # Recover surface tags from OCC's fragmentation map.
-        #
-        # out_map first contains one entry per input region,
-        # then one per disk input.
-        # ----------------------------------------------------
 
         n_regions = len(
             region_entities
@@ -564,8 +506,6 @@ def build_mesh() -> None:
                         tag
                     )
 
-        # Keep only surfaces that belong to the actual total
-        # rectangular simulation domain.
         all_region_surface_tags = set()
 
         for tags in (
@@ -580,7 +520,6 @@ def build_mesh() -> None:
             all_region_surface_tags
         )
 
-        # Remove disk material from each background region.
         background_surface_sets = {}
 
         for (
@@ -596,10 +535,6 @@ def build_mesh() -> None:
                 tags
                 - disk_surface_tags
             )
-
-        # ----------------------------------------------------
-        # Physical surface groups used by the FEM loader.
-        # ----------------------------------------------------
 
         for (
             name,
@@ -621,10 +556,6 @@ def build_mesh() -> None:
             disk_surface_tags,
             "disks",
         )
-
-        # ----------------------------------------------------
-        # Exterior boundaries.
-        # ----------------------------------------------------
 
         left = (
             identify_vertical_boundary_curves(
@@ -732,7 +663,6 @@ def build_mesh() -> None:
                 "Periodic geometry construction needs inspection."
             )
 
-        # Verify corresponding segment locations and lengths.
         for (
             left_row,
             right_row,
@@ -816,14 +746,6 @@ def build_mesh() -> None:
             "top",
         )
 
-        # ----------------------------------------------------
-        # Force matching left/right mesh nodes.
-        #
-        # master = left
-        # slave  = right
-        # right = left translated by +L in x.
-        # ----------------------------------------------------
-
         affine_left_to_right = [
             1.0, 0.0, 0.0, L,
             0.0, 1.0, 0.0, 0.0,
@@ -837,12 +759,6 @@ def build_mesh() -> None:
             left_tags,
             affine_left_to_right,
         )
-
-        # ----------------------------------------------------
-        # Mesh-size fields.
-        #
-        # Refine near ALL disk/interface curves.
-        # ----------------------------------------------------
 
         disk_curves = set()
 
@@ -887,10 +803,6 @@ def build_mesh() -> None:
 
         mesh_fields = []
 
-        # ----------------------------------------------------
-        # A) Very fine resolution at every disk/material
-        #    interface, grading smoothly out to the PML size.
-        # ----------------------------------------------------
         if disk_curves:
 
             distance_field = (
@@ -953,10 +865,6 @@ def build_mesh() -> None:
                 interface_field
             )
 
-        # ----------------------------------------------------
-        # B) Keep the whole 7 x 7 um scattering region fine
-        #    enough to resolve phase accumulation between disks.
-        # ----------------------------------------------------
         scatter_field = (
             gmsh.model.mesh.field.add(
                 "Box"
@@ -1003,9 +911,6 @@ def build_mesh() -> None:
             scatter_field
         )
 
-        # ----------------------------------------------------
-        # C) Moderate resolution in the ordinary-air buffers.
-        # ----------------------------------------------------
         for y0, y1 in (
             (Y_AIR_MIN, Y_SCAT_MIN),
             (Y_SCAT_MAX, Y_AIR_MAX),
@@ -1056,11 +961,6 @@ def build_mesh() -> None:
                 air_field
             )
 
-        # The minimum of all fields gives:
-        # disk interface ~0.02 um
-        # scatter bulk   ~0.06 um
-        # air buffers    ~0.10 um
-        # PML            ~0.14 um
         min_field = (
             gmsh.model.mesh.field.add(
                 "Min"
@@ -1101,7 +1001,6 @@ def build_mesh() -> None:
             2
         )
 
-        # Basic element/node counts.
         (
             node_tags,
             _,
@@ -1160,7 +1059,6 @@ def build_mesh() -> None:
     finally:
 
         gmsh.finalize()
-
 
 if __name__ == "__main__":
 

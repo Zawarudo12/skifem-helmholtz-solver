@@ -19,7 +19,6 @@ from .disordered_fast import (
     load_disordered_mesh,
 )
 
-
 @dataclass
 class CachedDisorderedTimings:
     source_assembly: float
@@ -27,7 +26,6 @@ class CachedDisorderedTimings:
     linear_solve: float
     reconstruction: float
     total: float
-
 
 class CachedDisorderedSolver:
     """
@@ -308,7 +306,6 @@ class CachedDisorderedSolver:
             )
         )
 
-        # Preserve the existing result interface.
         timings = SolveTimings(
             mesh_and_basis=0.0,
             periodic_setup=0.0,

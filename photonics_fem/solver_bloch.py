@@ -30,7 +30,6 @@ from .pml import (
 
 from .solver import FEMSolution
 
-
 @dataclass
 class BlochSolveResult:
     """Full FEM solution plus Bloch reduction information."""
@@ -40,7 +39,6 @@ class BlochSolveResult:
 
     reduced_dofs: int
     free_reduced_dofs: int
-
 
 def solve_slab_pml_bloch(
     cfg: BottomPMLConfig,
@@ -76,10 +74,6 @@ def solve_slab_pml_bloch(
             "order must be 1 or 2"
         )
 
-    # --------------------------------------------------
-    # Mesh and FEM function space
-    # --------------------------------------------------
-
     mesh = make_bottom_pml_mesh(
         cfg,
         h_target=h_target,
@@ -93,11 +87,6 @@ def solve_slab_pml_bloch(
             2 * order + 2,
         ),
     )
-
-    # --------------------------------------------------
-    # Assemble the exact same full FEM operator as our
-    # already validated PML solver.
-    # --------------------------------------------------
 
     K, M = assemble_physical_volume(
         basis,
@@ -125,12 +114,6 @@ def solve_slab_pml_bloch(
         + B_top
     ).tocsr()
 
-    # --------------------------------------------------
-    # Construct Bloch projection
-    #
-    # u_R = exp(i kx Lambda) u_L
-    # --------------------------------------------------
-
     reduction = build_bloch_projection(
         basis=basis,
         period=cfg.width,
@@ -138,13 +121,6 @@ def solve_slab_pml_bloch(
     )
 
     P = reduction.P
-
-    # --------------------------------------------------
-    # Galerkin projection
-    #
-    # Ared = P^H A P
-    # bred = P^H b
-    # --------------------------------------------------
 
     PH = P.conjugate().transpose()
 
@@ -158,13 +134,6 @@ def solve_slab_pml_bloch(
         PH @ b,
         dtype=np.complex128,
     ).reshape(-1)
-
-    # --------------------------------------------------
-    # Bottom Dirichlet termination of the PML.
-    #
-    # Find which reduced DOFs correspond to the full
-    # bottom-boundary DOFs.
-    # --------------------------------------------------
 
     bottom_full = np.asarray(
         basis
@@ -189,10 +158,6 @@ def solve_slab_pml_bloch(
         bottom_red,
     )
 
-    # --------------------------------------------------
-    # Solve reduced system
-    # --------------------------------------------------
-
     z = np.zeros(
         A_red.shape[0],
         dtype=np.complex128,
@@ -210,12 +175,6 @@ def solve_slab_pml_bloch(
         A_free.tocsc(),
         b_free,
     )
-
-    # --------------------------------------------------
-    # Recover full FEM vector
-    #
-    # u = P z
-    # --------------------------------------------------
 
     u_full = np.asarray(
         P @ z,

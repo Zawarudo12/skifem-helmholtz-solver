@@ -12,7 +12,6 @@ from .solver_full_pml import (
     FullPMLSolveResult,
 )
 
-
 def sample_scattered_centerline(
     result: FullPMLSolveResult,
     y: Sequence[float] | np.ndarray,
@@ -42,7 +41,6 @@ def sample_scattered_centerline(
         )(pts),
         dtype=np.complex128,
     )
-
 
 def sample_total_centerline(
     result: FullPMLSolveResult,
@@ -93,7 +91,6 @@ def sample_total_centerline(
         u_incident
         + u_scattered
     )
-
 
 def fit_full_pml_rt(
     result: FullPMLSolveResult,

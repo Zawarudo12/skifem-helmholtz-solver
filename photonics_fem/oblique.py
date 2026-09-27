@@ -4,7 +4,6 @@ import numpy as np
 
 from .config import SlabConfig
 
-
 def outgoing_ky(
     k0: float,
     n: complex,
@@ -40,7 +39,6 @@ def outgoing_ky(
 
     return ky
 
-
 def incident_wavevector(
     cfg: SlabConfig,
     angle_deg: float,
@@ -68,7 +66,6 @@ def incident_wavevector(
     )
 
     return complex(kx), complex(ky)
-
 
 def slab_rt_te_oblique(
     cfg: SlabConfig,
@@ -98,9 +95,6 @@ def slab_rt_te_oblique(
         kx,
     )
 
-    # TE optical admittance for mu_r = 1.
-    #
-    # Common k0 factor cancels in Fresnel ratios.
     y0 = ky0 / cfg.k0
     y1 = ky1 / cfg.k0
     y2 = ky2 / cfg.k0

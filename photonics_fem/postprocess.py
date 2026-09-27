@@ -4,13 +4,11 @@ from numpy.typing import ArrayLike
 from .analytics import slab_field
 from .solver import FEMSolution
 
-
 def sample_centerline(sol: FEMSolution, y: ArrayLike) -> np.ndarray:
     y = np.asarray(y, dtype=float)
     x = np.full_like(y, 0.5 * sol.cfg.width)
     pts = np.vstack([x, y])
     return np.asarray(sol.basis.interpolator(sol.u)(pts), dtype=complex)
-
 
 def relative_l2_profile_error(sol: FEMSolution, npts: int = 4001) -> float:
     """Relative L2 error of the centerline field profile."""
@@ -20,7 +18,6 @@ def relative_l2_profile_error(sol: FEMSolution, npts: int = 4001) -> float:
     num = np.trapezoid(np.abs(uh - ue) ** 2, y)
     den = np.trapezoid(np.abs(ue) ** 2, y)
     return float(np.sqrt(num / den))
-
 
 def fit_plane_waves(sol: FEMSolution) -> dict[str, complex | float]:
     """Least-squares extraction of downward/upward amplitudes in homogeneous air."""

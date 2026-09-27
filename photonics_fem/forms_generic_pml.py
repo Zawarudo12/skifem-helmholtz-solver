@@ -20,7 +20,6 @@ from .pml_generic import (
     stretch_1d,
 )
 
-
 def assemble_te_generic_pml(
     basis: Basis,
     cfg: FullPMLConfig,
@@ -57,10 +56,6 @@ def assemble_te_generic_pml(
         x = w.x[0]
         y = w.x[1]
 
-        # --------------------------------------------------
-        # Coordinate stretches
-        # --------------------------------------------------
-
         sx = np.ones_like(
             x,
             dtype=np.complex128,
@@ -78,19 +73,6 @@ def assemble_te_generic_pml(
             sigma_max=cfg.pml_sigma_max,
             order=cfg.pml_order,
         )
-
-        # --------------------------------------------------
-        # Relative permittivity
-        #
-        # top PML + top air:
-        #       eps = n_inc^2
-        #
-        # slab:
-        #       eps = n_slab^2
-        #
-        # bottom air + bottom PML:
-        #       eps = n_out^2
-        # --------------------------------------------------
 
         eps_r = np.full(
             y.shape,
@@ -114,10 +96,6 @@ def assemble_te_generic_pml(
         eps_r[bottom_mask] = (
             cfg.n_out**2
         )
-
-        # --------------------------------------------------
-        # FEM gradients
-        # --------------------------------------------------
 
         gu = grad(u)
         gv = grad(v)

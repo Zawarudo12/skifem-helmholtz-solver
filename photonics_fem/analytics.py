@@ -3,7 +3,6 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from .config import SlabConfig
 
-
 def slab_rt(cfg: SlabConfig) -> tuple[complex, complex, float, float]:
     """Air/slab/air (or n0/n1/n2) normal-incidence TE amplitudes and powers.
 
@@ -28,7 +27,6 @@ def slab_rt(cfg: SlabConfig) -> tuple[complex, complex, float, float]:
     T = float((np.real(n2) / np.real(n0)) * abs(t) ** 2)
     return r, t, R, T
 
-
 def slab_field(y: ArrayLike, cfg: SlabConfig) -> NDArray[np.complex128]:
     """Exact total TE field versus depth y, with incident amplitude 1 at y=0."""
     y = np.asarray(y, dtype=float)
@@ -39,7 +37,6 @@ def slab_field(y: ArrayLike, cfg: SlabConfig) -> NDArray[np.complex128]:
     d = cfg.slab_thickness
     z = y - a
 
-    # Slab coefficients for a unit incident amplitude at the first interface.
     A = 0.5 * ((1.0 + r) + (n0 / n1) * (1.0 - r))
     B = 0.5 * ((1.0 + r) - (n0 / n1) * (1.0 - r))
     phase_to_interface = np.exp(1j * k0 * n0 * a)
@@ -61,7 +58,6 @@ def slab_field(y: ArrayLike, cfg: SlabConfig) -> NDArray[np.complex128]:
         1j * k0 * n2 * (z[bottom] - d)
     )
     return u
-
 
 def fabry_perot_resonances(cfg: SlabConfig, m_values: ArrayLike) -> NDArray[np.float64]:
     """Lossless symmetric-slab resonances: lambda_m = 2 n d / m."""

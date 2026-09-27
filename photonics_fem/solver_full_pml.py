@@ -34,7 +34,6 @@ from .solver import (
     FEMSolution,
 )
 
-
 @dataclass
 class FullPMLSolveResult:
     """Scattered-field solution using PMLs above and below."""
@@ -50,7 +49,6 @@ class FullPMLSolveResult:
 
     reduced_dofs: int
     free_reduced_dofs: int
-
 
 def solve_full_pml_te(
     cfg: FullPMLConfig,
@@ -85,10 +83,6 @@ def solve_full_pml_te(
         ),
     )
 
-    # --------------------------------------------------
-    # Physical Helmholtz operator
-    # --------------------------------------------------
-
     K, M = assemble_full_physical_volume(
         basis,
         cfg,
@@ -99,18 +93,10 @@ def solve_full_pml_te(
         - cfg.k0**2 * M
     )
 
-    # --------------------------------------------------
-    # Top + bottom PML
-    # --------------------------------------------------
-
     A_pml = assemble_full_pml_operator(
         basis,
         cfg,
     )
-
-    # --------------------------------------------------
-    # Scattered-field volume source
-    # --------------------------------------------------
 
     b, kx, ky_inc = (
         assemble_scattered_field_source(
@@ -124,10 +110,6 @@ def solve_full_pml_te(
         A_physical
         + A_pml
     ).tocsr()
-
-    # --------------------------------------------------
-    # Bloch periodicity
-    # --------------------------------------------------
 
     reduction = build_bloch_projection(
         basis=basis,
@@ -155,12 +137,6 @@ def solve_full_pml_te(
         PH @ b,
         dtype=np.complex128,
     ).reshape(-1)
-
-    # --------------------------------------------------
-    # Outer PML walls:
-    #
-    # scattered field = 0
-    # --------------------------------------------------
 
     top_full = np.asarray(
         basis

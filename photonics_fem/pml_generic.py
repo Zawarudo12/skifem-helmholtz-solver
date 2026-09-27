@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 
-
 def polynomial_sigma(
     distance: np.ndarray,
     thickness: float,
@@ -31,7 +30,6 @@ def polynomial_sigma(
         * xi**order
     )
 
-
 def stretch_1d(
     coordinate: np.ndarray,
     physical_min: float,
@@ -55,7 +53,6 @@ def stretch_1d(
         dtype=float,
     )
 
-    # Low-side PML, e.g. top or left.
     if pml_low > 0.0:
 
         mask = (
@@ -75,7 +72,6 @@ def stretch_1d(
             order,
         )
 
-    # High-side PML, e.g. bottom or right.
     if pml_high > 0.0:
 
         mask = (

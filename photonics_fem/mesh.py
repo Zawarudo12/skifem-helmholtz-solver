@@ -3,11 +3,9 @@ import numpy as np
 from skfem import MeshTri
 from .config import SlabConfig
 
-
 def _segment_nodes(a: float, b: float, h_target: float) -> np.ndarray:
     n = max(1, int(np.ceil((b - a) / h_target)))
     return np.linspace(a, b, n + 1)
-
 
 def make_aligned_mesh(cfg: SlabConfig, h_target: float) -> MeshTri:
     """Structured triangular mesh whose y-grid is exactly aligned to interfaces."""
@@ -34,7 +32,6 @@ def make_aligned_mesh(cfg: SlabConfig, h_target: float) -> MeshTri:
         "bottom_air": lambda X: X[1] > cfg.slab_y1 + tol,
     })
     return mesh
-
 
 def max_edge_length(mesh: MeshTri) -> float:
     """Largest physical triangle edge length."""
