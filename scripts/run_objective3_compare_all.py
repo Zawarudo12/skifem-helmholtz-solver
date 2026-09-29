@@ -10,7 +10,7 @@ import matplotlib.tri as mtri
 
 import numpy as np
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
 
     Objective3Config,
 
@@ -26,7 +26,7 @@ from photonics_fem_solver import (
 
 OUT = Path(
 
-    "results_objective3_redo"
+    "Results/Objective_3"
 
 )
 
@@ -66,13 +66,13 @@ FINE_MESH = (
 
 FDTD_FILE = Path(
 
-    "dataset_hollow_core_fdtd(1).csv"
+    "comparison_data/Objective_3/dataset_hollow_core_fdtd(1).csv"
 
 )
 
 COMSOL_FILE = Path(
 
-    "Comsol1.csv"
+    "comparison_data/Objective_3/Comsol1.csv"
 
 )
 
@@ -1687,4 +1687,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
+
+
 

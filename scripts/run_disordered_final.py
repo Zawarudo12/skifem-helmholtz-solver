@@ -15,8 +15,8 @@ from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
 
-from photonics_fem_solver import CachedDisorderedSolver
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import CachedDisorderedSolver
+from solver.photonics_fem_solver import (
     DisorderedConfig,
     diffraction_orders,
 )
@@ -26,15 +26,15 @@ MESH_FILE = Path(
 )
 
 FDTD_FILE = Path(
-    "dataset_disordered_disks_fdtd.csv"
+    "comparison_data/Disordered/dataset_disordered_disks_fdtd.csv"
 )
 
 COMSOL_FILE = Path(
-    "Disorderd1.csv"
+    "comparison_data/Disordered/Disorderd1.csv"
 )
 
 OUT = Path(
-    "results_disordered_final"
+    "Results/Disordered"
 )
 OUT.mkdir(exist_ok=True)
 
@@ -969,4 +969,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 

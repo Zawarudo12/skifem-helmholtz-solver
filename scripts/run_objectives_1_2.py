@@ -3,35 +3,35 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     BottomPMLConfig,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     solve_slab_pml_bloch,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     sample_centerline,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     FullPMLConfig,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     solve_generic_pml_te,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     fit_full_pml_rt,
 )
 
-from photonics_fem_solver import (
+from solver.photonics_fem_solver import (
     slab_rt_te_oblique,
 )
 
-OUT = Path("results_objectives_1_2")
+OUT = Path("Results/Objective_1_2")
 OUT.mkdir(exist_ok=True)
 
 WAVELENGTHS = np.linspace(
@@ -740,4 +740,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+
 

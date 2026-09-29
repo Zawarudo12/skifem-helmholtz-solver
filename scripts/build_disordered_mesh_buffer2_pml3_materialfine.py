@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
 
 POSITIONS_FILE = Path(
-    "disks_positions_diameter=0.26_L=7.csv"
+    "geometry_data/Disordered/disks_positions_diameter=0.26_L=7.csv"
 )
 
 MESH_DIR = Path(
@@ -306,7 +306,7 @@ def build_mesh() -> None:
 
     print()
     print("=" * 84)
-    print("BUILDING DISORDERED MESH — AIR 2.0 / PML 3.0 / MATERIAL-FINE")
+    print("BUILDING DISORDERED MESH â€” AIR 2.0 / PML 3.0 / MATERIAL-FINE")
     print("=" * 84)
 
     print(
@@ -1063,3 +1063,6 @@ def build_mesh() -> None:
 if __name__ == "__main__":
 
     build_mesh()
+
+
+

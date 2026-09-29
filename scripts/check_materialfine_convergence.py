@@ -11,8 +11,8 @@ from time import perf_counter
 
 import numpy as np
 
-from photonics_fem_solver import CachedDisorderedSolver
-from photonics_fem_solver import DisorderedConfig, diffraction_orders
+from solver.photonics_fem_solver import CachedDisorderedSolver
+from solver.photonics_fem_solver import DisorderedConfig, diffraction_orders
 
 COARSE_MESH = Path(
     "meshes_disordered/disordered_196disks_buffer2_pml3.msh"
@@ -23,11 +23,11 @@ REFINED_MESH = Path(
 )
 
 FDTD_FILE = Path(
-    "dataset_disordered_disks_fdtd.csv"
+    "comparison_data/Disordered/dataset_disordered_disks_fdtd.csv"
 )
 
 COMSOL_FILE = Path(
-    "Disorderd1.csv"
+    "comparison_data/Disordered/Disorderd1.csv"
 )
 
 WAVELENGTHS = np.array(
@@ -259,4 +259,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 
