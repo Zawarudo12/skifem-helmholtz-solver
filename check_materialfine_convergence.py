@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -11,8 +11,8 @@ from time import perf_counter
 
 import numpy as np
 
-from photonics_fem.disordered_cached import CachedDisorderedSolver
-from photonics_fem.disordered_fast import DisorderedConfig, diffraction_orders
+from photonics_fem_solver import CachedDisorderedSolver
+from photonics_fem_solver import DisorderedConfig, diffraction_orders
 
 COARSE_MESH = Path(
     "meshes_disordered/disordered_196disks_buffer2_pml3.msh"
@@ -259,3 +259,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

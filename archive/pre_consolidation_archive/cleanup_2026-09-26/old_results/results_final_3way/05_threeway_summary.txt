@@ -1,0 +1,35 @@
+DISORDERED MEDIA — THREE-WAY VALIDATION SUMMARY
+========================================================================
+
+Common comparison wavelengths: 97
+Range: 1.000000–2.391304 µm
+
+RUNTIME
+------------------------------------------------------------------------
+COMSOL sweep wall time:      163.0 s (2 min 43 s) (measured)
+scikit-fem sweep time:       819.7 s (13 min 40 s) (estimated from sum(point_time_s)/2; worker setup/imbalance not included)
+FDTD reference runtime:      not provided
+Known COMSOL + FEM compute:   982.7 s (16 min 23 s)
+
+POWER CONSERVATION
+------------------------------------------------------------------------
+COMSOL max |R+T-1|:          1.066258e-12
+scikit-fem max |R+T-1|:      7.953418e-03
+FDTD max |R+T-1|:            1.421768e-01
+
+PAIRWISE FULL-SPECTRUM ERROR
+------------------------------------------------------------------------
+COMSOL vs scikit-fem R: MAE=5.414754e-02, RMSE=9.214225e-02, MAX=3.832223e-01
+COMSOL vs scikit-fem T: MAE=5.418490e-02, RMSE=9.224091e-02, MAX=3.831737e-01
+COMSOL vs FDTD R:       MAE=1.769637e-02, RMSE=3.486750e-02, MAX=2.095064e-01
+COMSOL vs FDTD T:       MAE=1.260718e-02, RMSE=2.878566e-02, MAX=2.003640e-01
+scikit-fem vs FDTD R:   MAE=5.723875e-02, RMSE=9.145152e-02, MAX=3.719525e-01
+scikit-fem vs FDTD T:   MAE=5.345045e-02, RMSE=8.874895e-02, MAX=3.706440e-01
+
+TARGET STOP BAND 1.4–1.8 µm
+------------------------------------------------------------------------
+COMSOL       mean R=0.999972133, mean T=2.786719e-05, max T=7.245027e-04
+scikit-fem   mean R=0.999949246, mean T=5.048163e-05, max T=1.312429e-03
+FDTD         mean R=1.004466113, mean T=8.266444e-05, max T=2.127950e-03
+
+Note: runtime values are not a strict apples-to-apples benchmark because COMSOL and scikit-fem use different numerical formulations, meshes, solver implementations, and boundary treatments.

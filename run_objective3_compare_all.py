@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
@@ -10,7 +10,7 @@ import matplotlib.tri as mtri
 
 import numpy as np
 
-from photonics_fem.objective3_bodyfitted import (
+from photonics_fem_solver import (
 
     Objective3Config,
 
@@ -1687,3 +1687,4 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+

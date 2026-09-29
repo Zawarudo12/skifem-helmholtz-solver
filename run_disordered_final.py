@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 
@@ -15,8 +15,8 @@ from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
 
-from photonics_fem.disordered_cached import CachedDisorderedSolver
-from photonics_fem.disordered_fast import (
+from photonics_fem_solver import CachedDisorderedSolver
+from photonics_fem_solver import (
     DisorderedConfig,
     diffraction_orders,
 )
@@ -34,7 +34,7 @@ COMSOL_FILE = Path(
 )
 
 OUT = Path(
-    "results_disordered_postdoc_3way_materialfine"
+    "results_disordered_final"
 )
 OUT.mkdir(exist_ok=True)
 
@@ -348,7 +348,7 @@ def main():
     print()
     print("=" * 118)
     print(
-        "DISORDERED MEDIA — MATERIAL-FINE scikit-fem vs COMSOL vs FDTD"
+        "DISORDERED MEDIA â€” MATERIAL-FINE scikit-fem vs COMSOL vs FDTD"
     )
     print("=" * 118)
     print(f"Mesh                  = {MESH_FILE}")
@@ -617,7 +617,7 @@ def main():
         w,
         R_fem,
         linewidth=2.1,
-        label="scikit-fem R — all propagating orders",
+        label="scikit-fem R â€” all propagating orders",
     )
 
     ax.plot(
@@ -695,7 +695,7 @@ def main():
         w,
         T_fem,
         linewidth=2.1,
-        label="scikit-fem T — all propagating orders",
+        label="scikit-fem T â€” all propagating orders",
     )
 
     ax.plot(
@@ -969,3 +969,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

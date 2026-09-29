@@ -1,33 +1,33 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from photonics_fem.pml import (
+from photonics_fem_solver import (
     BottomPMLConfig,
 )
 
-from photonics_fem.solver_bloch import (
+from photonics_fem_solver import (
     solve_slab_pml_bloch,
 )
 
-from photonics_fem.postprocess import (
+from photonics_fem_solver import (
     sample_centerline,
 )
 
-from photonics_fem.full_pml import (
+from photonics_fem_solver import (
     FullPMLConfig,
 )
 
-from photonics_fem.solver_generic_pml import (
+from photonics_fem_solver import (
     solve_generic_pml_te,
 )
 
-from photonics_fem.postprocess_full_pml import (
+from photonics_fem_solver import (
     fit_full_pml_rt,
 )
 
-from photonics_fem.oblique import (
+from photonics_fem_solver import (
     slab_rt_te_oblique,
 )
 
@@ -740,3 +740,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
